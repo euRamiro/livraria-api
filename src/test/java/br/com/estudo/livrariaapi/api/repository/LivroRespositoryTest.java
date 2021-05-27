@@ -2,6 +2,8 @@ package br.com.estudo.livrariaapi.api.repository;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
+import java.util.Optional;
+
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -25,7 +27,8 @@ public class LivroRespositoryTest {
 	@DisplayName("deve retornar true quando existir um livro cadastrado com isbn")
 	public void deve_retornar_true_quando_existir_livro_cadastrado_com_isbn() {
 		String isbn = "123";
-		livroRepository.save(LivroEntity.builder().id(22L).titulo("os testes").autor("Testador").isbn(isbn).build());
+		LivroEntity livroSalvar = LivroEntity.builder().id(22L).titulo("os testes").autor("Testador").isbn(isbn).build();
+		livroRepository.save(livroSalvar);
 		
 		boolean existe = livroRepository.existsByIsbn(isbn);
 		
@@ -40,5 +43,16 @@ public class LivroRespositoryTest {
 		boolean existe = livroRepository.existsByIsbn(isbn);
 		
 		assertThat(existe).isFalse();
+	}
+	
+	@Test
+	@DisplayName("deve buscar um livro por id")
+	public void deve_buscar_um_livro_por_id() {				
+		LivroEntity livroSalvar = LivroEntity.builder().titulo("Código limpo").autor("Bob").isbn("25258487").build();
+		livroRepository.save(livroSalvar);
+		
+		Optional<LivroEntity> livroEncontrado = livroRepository.findById(livroSalvar.getId());
+		
+		assertThat(livroEncontrado.isPresent()).isTrue();		
 	}
 }

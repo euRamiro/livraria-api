@@ -92,8 +92,8 @@ public class LivroControllerTest {
 	}
 
 	@Test
-	@DisplayName("deve buscar um livro")
-	public void deve_buscar_um_livro() throws Exception {
+	@DisplayName("deve buscar um livro por id")
+	public void deve_buscar_um_livro_por_id() throws Exception {
 		Long id = 100L;
 		LivroEntity livroSalvo = LivroEntity.builder().id(100L).titulo("Teste com tdd").autor("alguém").isbn("123").build();
 
@@ -161,4 +161,52 @@ public class LivroControllerTest {
 		.andExpect(jsonPath("message").value("Livro não encontrado."))
 		;
 	}
+	
+	@Test
+	@DisplayName("deve editar um livro")
+	public void deve_editar_livro() throws Exception {
+		Long id = 80L;
+		LivroEntity livroSalvo = LivroEntity.builder().id(id).titulo("Teste com tdd").autor("alguém").isbn("123").build();
+		BDDMockito.given(livroService.buscarPorId(id)).willReturn(Optional.of(livroSalvo));
+		
+		
+		LivroEntity livroEditado = LivroEntity.builder().id(id).titulo("Springboot na prática").autor("Spring").isbn("123").build();				
+		BDDMockito.given(livroService.salvar(livroEditado)).willReturn(livroEditado);
+		
+		String json = new ObjectMapper().writeValueAsString(livroEditado);		
+		
+		MockHttpServletRequestBuilder request = MockMvcRequestBuilders
+				.put(LIVRO_API.concat("/"+id))
+				.content(json)
+				.accept(MediaType.APPLICATION_JSON)
+				.contentType(MediaType.APPLICATION_JSON);
+		
+		mock
+			.perform(request)
+			.andExpect(status().isCreated());
+	}
+	
+	@Test
+	@DisplayName("deve lançar ObjetoNaoEncontradoException quando editar um livro inexistente")
+	public void deve_lancar_ObjetoNaoEncontradoException_quando_editar_livro_inexistente() throws Exception{				
+
+		String json = new ObjectMapper().writeValueAsString(LivroDto.builder().id(6L).titulo("Springboot na prática").autor("Spring").isbn("741").build());
+		
+		BDDMockito.given(livroService.buscarPorId(Mockito.anyLong()))
+			.willReturn(Optional.empty());
+		
+		
+		MockHttpServletRequestBuilder request = MockMvcRequestBuilders
+				.put(LIVRO_API.concat("/"+100))
+				.content(json)
+				.accept(MediaType.APPLICATION_JSON)
+				.contentType(MediaType.APPLICATION_JSON);
+		
+		mock
+			.perform(request)
+			.andExpect(status().isNotFound())
+			.andExpect(jsonPath("message").value("Livro não encontrado."))
+			;
+	}
+	
 }

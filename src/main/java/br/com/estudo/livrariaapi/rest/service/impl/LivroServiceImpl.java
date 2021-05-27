@@ -24,17 +24,26 @@ public class LivroServiceImpl implements LivroService {
 		if (livroRepository.existsByIsbn(livroEntity.getIsbn())) {
 			throw new RegraDeNegocioException("Isbn já cadastrado.");
 		}
-		return livroRepository.save(livroEntity);
+		return this.livroRepository.save(livroEntity);
 	}
 	
 	public Optional<LivroEntity> buscarPorId(Long id) {		
-		return livroRepository.findById(id);
+		return this.livroRepository.findById(id);
 	}
 
-	@Override
 	public void deletar(LivroEntity livro) {
-		// TODO Auto-generated method stub
-		
-	}
+		if (livro == null || livro.getId() == null) {
+			throw new IllegalArgumentException("Livro não pode ser vazio.");
+		}
+		this.livroRepository.delete(livro);	
+	} 
+	
+	public void editar(LivroEntity livro) {
+		if (livro == null || livro.getId() == null) {
+			throw new IllegalArgumentException("Livro não pode ser vazio.");
+		}
+		this.livroRepository.save(livro);	
+	} 
+	
 
 }

@@ -2,6 +2,8 @@ package br.com.estudo.livrariaapi.api.service;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
+import java.util.Optional;
+
 import org.assertj.core.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
@@ -58,4 +60,30 @@ public class LivroServiceTest {
 		Mockito.verify(livroRepository, Mockito.never()).save(livro);
 	}
 
+	@Test
+	@DisplayName("deve buscar um livro por id")
+	public void deve_buscar_um_livro_por_id() throws Exception {
+		Long id = 55L;
+		LivroEntity livroSalvo = LivroEntity.builder().id(id).titulo("Springboot na prática").autor("Spring").isbn("741").build();
+		Mockito.when(livroRepository.findById(id)).thenReturn(Optional.of(livroSalvo));
+		
+		Optional<LivroEntity> livroEncontrado = livroService.buscarPorId(id);
+		
+		assertThat(livroEncontrado.isPresent()).isTrue();
+		assertThat(livroSalvo.getTitulo()).isEqualTo(livroEncontrado.get().getTitulo());
+		assertThat(livroSalvo.getAutor()).isEqualTo(livroEncontrado.get().getAutor());
+		assertThat(livroSalvo.getIsbn()).isEqualTo(livroEncontrado.get().getIsbn());
+	}
+	
+	@Test
+	@DisplayName("deve retornar vazio quando buscar um livro inexistente ")
+	public void deve_retornar_vazio_quando_buscar_um_livro_inexistente() throws Exception {
+		Long id = 26L;		
+		Mockito.when(livroRepository.findById(id)).thenReturn(Optional.empty());
+		
+		Optional<LivroEntity> livroEncontrado = livroService.buscarPorId(id);
+		
+		assertThat(livroEncontrado.isPresent()).isFalse();
+		Mockito.verify(livroRepository, Mockito.times(1)).findById(id);
+	}
 }
