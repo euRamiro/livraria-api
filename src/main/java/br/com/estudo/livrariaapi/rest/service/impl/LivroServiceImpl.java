@@ -1,5 +1,7 @@
 package br.com.estudo.livrariaapi.rest.service.impl;
 
+import java.util.Optional;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -23,6 +25,10 @@ public class LivroServiceImpl implements LivroService {
 			throw new RegraDeNegocioException("Isbn já cadastrado.");
 		}
 		return livroRepository.save(livroEntity);
+	}
+	
+	public Optional<LivroEntity> buscarPorId(Long id) {		
+		return livroRepository.findById(id);
 	}
 
 }
