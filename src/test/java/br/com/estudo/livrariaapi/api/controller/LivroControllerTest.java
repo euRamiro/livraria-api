@@ -1,4 +1,4 @@
-package br.com.estudo.livrariaapi.api.resource;
+package br.com.estudo.livrariaapi.api.controller;
 
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
