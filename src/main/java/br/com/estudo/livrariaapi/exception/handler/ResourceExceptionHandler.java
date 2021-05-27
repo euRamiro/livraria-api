@@ -13,6 +13,7 @@ import org.springframework.web.bind.annotation.ExceptionHandler;
 import br.com.estudo.livrariaapi.exception.handler.validation.StandardError;
 import br.com.estudo.livrariaapi.exception.handler.validation.ValidationError;
 import br.com.estudo.livrariaapi.exception.model.ObjetoNaoEncontradoException;
+import br.com.estudo.livrariaapi.exception.model.RegraDeNegocioException;
 
 @ControllerAdvice
 public class ResourceExceptionHandler {
@@ -42,12 +43,26 @@ public class ResourceExceptionHandler {
 		StandardError erro = new StandardError();
 		erro.setTimestamp(System.currentTimeMillis());
 		erro.setStatus(404);
-		erro.setError("Não existem dados de operador.");
+		erro.setError("Não existem dados.");
 		erro.setMessage(e.getMessage());
 		erro.setPath(req.getRequestURI());
 		erro.setMensagemDesenvolvedor("");
 
 		return ResponseEntity.status(HttpStatus.NOT_FOUND).body(erro);
+	}
+	
+	@ExceptionHandler(RegraDeNegocioException.class)
+	public ResponseEntity<StandardError> handlerRegraDeNegocioException(RegraDeNegocioException e,
+			HttpServletRequest req) {
+		StandardError erro = new StandardError();
+		erro.setTimestamp(System.currentTimeMillis());
+		erro.setStatus(400);
+		erro.setError("Regra de negócio não atendida.");
+		erro.setMessage(e.getMessage());
+		erro.setPath(req.getRequestURI());
+		erro.setMensagemDesenvolvedor("");
+
+		return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(erro);
 	}
 
 	@ExceptionHandler(DataIntegrityViolationException.class)

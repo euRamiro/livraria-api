@@ -2,6 +2,7 @@ package br.com.estudo.livrariaapi.api.service;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
+import org.assertj.core.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -11,6 +12,7 @@ import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
 
+import br.com.estudo.livrariaapi.exception.model.RegraDeNegocioException;
 import br.com.estudo.livrariaapi.persistence.entity.LivroEntity;
 import br.com.estudo.livrariaapi.persistence.repository.LivroRepository;
 import br.com.estudo.livrariaapi.rest.service.LivroService;
@@ -42,6 +44,18 @@ public class LivroServiceTest {
 		assertThat(livroSalvo.getTitulo()).isEqualTo("os testes");
 		assertThat(livroSalvo.getAutor()).isEqualTo("Testador");
 		assertThat(livroSalvo.getIsbn()).isEqualTo("456");
+	}
+
+	@Test
+	@DisplayName("deve lançar uma exception quando cadastrar livro com isbn já cadastrado.")
+	public void deve_lancar_exception_quando_cadastrar_livro_com_isbn_cadastrado() throws Exception {
+		LivroEntity livro = LivroEntity.builder().titulo("os testes").autor("Testador").isbn("456").build();
+
+		Mockito.when(livroRepository.existsByIsbn(Mockito.anyString())).thenReturn(true);
+		Throwable exception = Assertions.catchThrowable(() -> livroService.salvar(livro));
+
+		assertThat(exception).isInstanceOf(RegraDeNegocioException.class).hasMessage("Isbn já cadastrado.");
+		Mockito.verify(livroRepository, Mockito.never()).save(livro);
 	}
 
 }

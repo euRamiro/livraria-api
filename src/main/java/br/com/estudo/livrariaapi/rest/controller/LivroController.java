@@ -3,6 +3,7 @@ package br.com.estudo.livrariaapi.rest.controller;
 import java.net.URI;
 
 import org.springframework.http.ResponseEntity;
+import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -25,7 +26,7 @@ public class LivroController {
 	private LivroMapper livroMapper;
 
 	@PostMapping
-	public ResponseEntity<LivroDto> salvar(@RequestBody LivroDto livroDto) {		
+	public ResponseEntity<LivroDto> salvar(@RequestBody @Validated LivroDto livroDto) {		
 		LivroEntity livroSalvo = livroService.salvar(livroMapper.toEntity(livroDto));
 		
 		URI uri = ServletUriComponentsBuilder.fromCurrentRequest().path("/{id}").buildAndExpand(livroMapper.toDto(livroSalvo))

@@ -3,6 +3,7 @@ package br.com.estudo.livrariaapi.rest.service.impl;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import br.com.estudo.livrariaapi.exception.model.RegraDeNegocioException;
 import br.com.estudo.livrariaapi.persistence.entity.LivroEntity;
 import br.com.estudo.livrariaapi.persistence.repository.LivroRepository;
 import br.com.estudo.livrariaapi.rest.service.LivroService;
@@ -18,6 +19,9 @@ public class LivroServiceImpl implements LivroService {
 	}
 
 	public LivroEntity salvar(LivroEntity livroEntity) {
+		if (livroRepository.existsByIsbn(livroEntity.getIsbn())) {
+			throw new RegraDeNegocioException("Isbn já cadastrado.");
+		}
 		return livroRepository.save(livroEntity);
 	}
 
