@@ -31,4 +31,10 @@ public class LivroServiceImpl implements LivroService {
 		return livroRepository.findById(id);
 	}
 
+	@Override
+	public void deletar(LivroEntity livro) {
+		// TODO Auto-generated method stub
+		
+	}
+
 }

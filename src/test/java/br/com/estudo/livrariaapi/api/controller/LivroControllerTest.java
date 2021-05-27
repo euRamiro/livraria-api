@@ -127,4 +127,38 @@ public class LivroControllerTest {
 			.andExpect(jsonPath("message").value("Livro não encontrado."))
 			;
 	}
+	
+	@Test
+	@DisplayName("deve deletar um livro")
+	public void deve_deletar_um_livro() throws Exception {
+		Long id = 105L;
+		
+		BDDMockito.given(livroService.buscarPorId(Mockito.anyLong())).willReturn(Optional.of(LivroEntity.builder().id(id).build()));
+		
+		
+		MockHttpServletRequestBuilder request = MockMvcRequestBuilders
+				.delete(LIVRO_API.concat("/"+id));
+		
+		mock
+			.perform(request)
+			.andExpect(status().isNoContent())
+			;
+	}
+	
+	@Test
+	@DisplayName("deve lancar ObjetoNaoEncontradoException quando deletar livro inexistente")
+	public void deve_lancar_ObjetoNaoEncontradoException_quando_deletar_livro_inexistente() throws Exception {
+		
+		BDDMockito.given(livroService.buscarPorId(Mockito.anyLong())).willReturn(Optional.empty());
+		
+		
+		MockHttpServletRequestBuilder request = MockMvcRequestBuilders
+				.delete(LIVRO_API.concat("/"+10));
+		
+		mock
+		.perform(request)
+		.andExpect(status().isNotFound())
+		.andExpect(jsonPath("message").value("Livro não encontrado."))
+		;
+	}
 }

@@ -10,4 +10,6 @@ public interface LivroService {
 
 	public Optional<LivroEntity> buscarPorId(Long id);
 
+	public void deletar(LivroEntity livro);
+
 }
