@@ -3,6 +3,10 @@ package br.com.estudo.livrariaapi.rest.service.impl;
 import java.util.Optional;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Example;
+import org.springframework.data.domain.ExampleMatcher;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
 import br.com.estudo.livrariaapi.exception.model.RegraDeNegocioException;
@@ -38,12 +42,25 @@ public class LivroServiceImpl implements LivroService {
 		this.livroRepository.delete(livro);	
 	} 
 	
-	public void editar(LivroEntity livro) {
+	public LivroEntity editar(LivroEntity livro) {
 		if (livro == null || livro.getId() == null) {
 			throw new IllegalArgumentException("Livro não pode ser vazio.");
 		}
-		this.livroRepository.save(livro);	
-	} 
-	
+		return this.livroRepository.save(livro);	
+	}
+
+	@Override
+	public Page<LivroEntity> buscarPorTituloAutor(LivroEntity filtro, Pageable pageable) {		
+		Example<LivroEntity> example = Example.of(filtro,
+				ExampleMatcher
+					.matching()
+					.withIgnoreCase()
+					.withIgnoreNullValues()
+					.withStringMatcher(ExampleMatcher.StringMatcher.CONTAINING)
+				); 
+		
+		return this.livroRepository.findAll(example, pageable);
+	}
+		
 
 }

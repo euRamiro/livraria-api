@@ -2,6 +2,8 @@ package br.com.estudo.livrariaapi.api.service;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Optional;
 
 import org.assertj.core.api.Assertions;
@@ -11,6 +13,10 @@ import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.Mockito;
 import org.springframework.boot.test.mock.mockito.MockBean;
+import org.springframework.data.domain.Example;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageImpl;
+import org.springframework.data.domain.PageRequest;
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
 
@@ -85,5 +91,75 @@ public class LivroServiceTest {
 		
 		assertThat(livroEncontrado.isPresent()).isFalse();
 		Mockito.verify(livroRepository, Mockito.times(1)).findById(id);
+	}
+	
+	@Test
+	@DisplayName("deve deletar um livro")
+	public void deve_deletar_um_livro() {
+		 LivroEntity livro = LivroEntity.builder().id(12L).build();
+		 
+		 org.junit.jupiter.api.Assertions.assertDoesNotThrow(() -> livroService.deletar(livro));
+		 
+		 Mockito.verify(livroRepository, Mockito.times(1)).delete(livro);
+	}
+	
+	@Test
+	@DisplayName("deve lançar Exception ao deletar livro inexistente")
+	public void deve_lancar_Exception_deletar_licro_inesistente() {
+		 LivroEntity livro = new LivroEntity();
+		 
+		 org.junit.jupiter.api.Assertions.assertThrows(IllegalArgumentException.class, () -> livroService.deletar(livro));
+		 
+		 Mockito.verify(livroRepository, Mockito.never()).delete(livro);
+	}
+	
+	@Test
+	@DisplayName("deve lançar Exception ao editar livro inexistente")
+	public void deve_lancar_Exception_editar_licro_inesistente() {
+		 LivroEntity livro = new LivroEntity();
+		 
+		 org.junit.jupiter.api.Assertions.assertThrows(IllegalArgumentException.class, () -> livroService.editar(livro));
+		 
+		 Mockito.verify(livroRepository, Mockito.never()).save(livro);
+	}
+	
+	@Test
+	@DisplayName("deve editar livro inexistente")
+	public void deve_editar_licro_inesistente() {
+		Long id = 15L;
+		LivroEntity livroSalvo = LivroEntity.builder().id(id).build();
+		 
+		LivroEntity dadosParaEditar = LivroEntity.builder().id(id).titulo("Springboot na prática").autor("Spring").isbn("741").build();
+		
+		Mockito.when(livroRepository.save(livroSalvo)).thenReturn(dadosParaEditar);
+		
+		LivroEntity livro = livroService.editar(livroSalvo);
+		
+		assertThat(livro.getId()).isEqualTo(id);
+		assertThat(livro.getTitulo()).isEqualTo(dadosParaEditar.getTitulo());
+		assertThat(livro.getAutor()).isEqualTo(dadosParaEditar.getAutor());
+		assertThat(livro.getIsbn()).isEqualTo(dadosParaEditar.getIsbn());
+	}
+	
+	@Test
+	@DisplayName("deve buscar por título e autor")
+	public void deve_buscar_por_titulo_e_autor() {
+		LivroEntity livro = LivroEntity.builder().titulo("Refatorando").autor("João").isbn("135984").build();
+		
+		PageRequest pageRequest = PageRequest.of(0, 10);
+				
+		List<LivroEntity> lista = new ArrayList<>();
+		lista.add(livro);
+		Page<LivroEntity> page = new PageImpl<LivroEntity>(lista, pageRequest, 1);
+		Mockito
+			.when( livroRepository.findAll(Mockito.any(Example.class), Mockito.any(PageRequest.class)))
+			.thenReturn(page);
+		
+		Page<LivroEntity> resultado = livroService.buscarPorTituloAutor(livro, pageRequest);
+		
+		assertThat(resultado.getTotalElements()).isEqualTo(1);
+		assertThat(resultado.getContent()).isEqualTo(lista);
+		assertThat(resultado.getPageable().getPageNumber()).isEqualTo(0);
+		assertThat(resultado.getPageable().getPageSize()).isEqualTo(10);
 	}
 }

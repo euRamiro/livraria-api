@@ -1,7 +1,12 @@
 package br.com.estudo.livrariaapi.rest.controller;
 
 import java.net.URI;
+import java.util.List;
+import java.util.stream.Collectors;
 
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageImpl;
+import org.springframework.data.domain.Pageable;
 import org.springframework.http.ResponseEntity;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.DeleteMapping;
@@ -71,4 +76,15 @@ public class LivroController {
 		return ResponseEntity.created(uri).build();
 	}
 
+	@GetMapping
+	public Page<LivroDto> buscarPorTituloAutor(LivroDto dto, Pageable pageable){
+		LivroEntity livroBuscar = livroMapper.toEntity(dto);
+		Page<LivroEntity> resultado = livroService.buscarPorTituloAutor(livroBuscar, pageable);
+		List<LivroDto> lista = resultado
+					.getContent()
+					.stream()
+					.map(livro -> livroMapper.toDto(livro))
+					.collect(Collectors.toList());
+		return new PageImpl<LivroDto>(lista, pageable, resultado.getNumberOfElements());
+	}
 }

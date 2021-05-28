@@ -55,4 +55,27 @@ public class LivroRespositoryTest {
 		
 		assertThat(livroEncontrado.isPresent()).isTrue();		
 	}
+	
+	@Test
+	@DisplayName("deve editar um livro")
+	public void deve_editar_um_livro() {
+		LivroEntity livro = LivroEntity.builder().titulo("Design de Software").autor("Paulo Silveira").isbn("15487").build();
+		
+		LivroEntity livroSalvo = livroRepository.save(livro);
+		
+		assertThat(livroSalvo.getId()).isNotNull();
+	}
+	
+	@Test
+	@DisplayName("deve deletar um livro")
+	public void deve_deletar_um_livro() {
+		LivroEntity livroSalvar = LivroEntity.builder().titulo("uml").autor("uml").isbn("99857").build();
+		livroRepository.save(livroSalvar);		
+		LivroEntity livroEncontrado = livroRepository.findById(livroSalvar.getId()).get();
+		
+		livroRepository.delete(livroEncontrado);
+		Optional<LivroEntity> livroDeletado = livroRepository.findById(livroEncontrado.getId());
+				
+		assertThat(livroDeletado.isPresent()).isFalse();
+	}
 }

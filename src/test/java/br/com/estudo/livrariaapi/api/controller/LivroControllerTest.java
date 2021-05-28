@@ -3,6 +3,8 @@ package br.com.estudo.livrariaapi.api.controller;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Optional;
 
 import org.hamcrest.Matchers;
@@ -15,6 +17,9 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
+import org.springframework.data.domain.PageImpl;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
 import org.springframework.http.MediaType;
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
@@ -206,6 +211,35 @@ public class LivroControllerTest {
 			.perform(request)
 			.andExpect(status().isNotFound())
 			.andExpect(jsonPath("message").value("Livro não encontrado."))
+			;
+	}
+	
+	@Test
+	@DisplayName("deve buscar livros")
+	public void deve_buscar_livros() throws Exception {
+		Long id = 38L;
+		LivroEntity livro = LivroEntity.builder().id(id).titulo("React na prática").autor("Moujor").isbn("121589").build();
+		List<LivroEntity> lista = new ArrayList<>();
+		lista.add(livro);
+				
+		BDDMockito
+			.given(livroService.buscarPorTituloAutor(Mockito.any(LivroEntity.class), Mockito.any(Pageable.class)))
+			.willReturn(new PageImpl<LivroEntity>(lista, PageRequest.of(1, 50), 1));		
+		
+		String queryString = String.format("?titulo=%s&autor=%s&page=0&size=50", 
+				livro.getTitulo(), livro.getAutor());
+		
+		MockHttpServletRequestBuilder request = MockMvcRequestBuilders
+				.get(LIVRO_API.concat(queryString))
+				.accept(MediaType.APPLICATION_JSON);
+					
+		mock
+			.perform(request)
+			.andExpect( status().isOk())
+			.andExpect(jsonPath("content", Matchers.hasSize(1)))
+			.andExpect(jsonPath("totalElements").value(1))
+			.andExpect(jsonPath("pageable.pageSize").value(50))
+			.andExpect(jsonPath("pageable.pageNumber").value(0))
 			;
 	}
 	
