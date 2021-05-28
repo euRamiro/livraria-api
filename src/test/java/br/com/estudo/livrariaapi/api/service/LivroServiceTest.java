@@ -105,7 +105,7 @@ public class LivroServiceTest {
 	
 	@Test
 	@DisplayName("deve lançar Exception ao deletar livro inexistente")
-	public void deve_lancar_Exception_deletar_licro_inesistente() {
+	public void deve_lancar_Exception_deletar_livro_inexistente() {
 		 LivroEntity livro = new LivroEntity();
 		 
 		 org.junit.jupiter.api.Assertions.assertThrows(IllegalArgumentException.class, () -> livroService.deletar(livro));
@@ -115,7 +115,7 @@ public class LivroServiceTest {
 	
 	@Test
 	@DisplayName("deve lançar Exception ao editar livro inexistente")
-	public void deve_lancar_Exception_editar_licro_inesistente() {
+	public void deve_lancar_Exception_editar_livro_inexistente() {
 		 LivroEntity livro = new LivroEntity();
 		 
 		 org.junit.jupiter.api.Assertions.assertThrows(IllegalArgumentException.class, () -> livroService.editar(livro));
@@ -125,7 +125,7 @@ public class LivroServiceTest {
 	
 	@Test
 	@DisplayName("deve editar livro inexistente")
-	public void deve_editar_licro_inesistente() {
+	public void deve_editar_livro_inesistente() {
 		Long id = 15L;
 		LivroEntity livroSalvo = LivroEntity.builder().id(id).build();
 		 

@@ -118,7 +118,7 @@ public class LivroControllerTest {
 	}
 
 	@Test
-	@DisplayName("deve lançar excpetion ObjetoNaoEncontrado quando bucarr um livro inexistente ")
+	@DisplayName("deve lançar ObjetoNaoEncontrado quando buscar um livro inexistente ")
 	public void deve_lancar_ObjetoNaoEncontraException_quando_buscar_um_livro_inexistente() throws Exception {
 		
 		BDDMockito.given(livroService.buscarPorId(Mockito.anyLong())).willReturn(Optional.empty());
@@ -169,7 +169,7 @@ public class LivroControllerTest {
 	
 	@Test
 	@DisplayName("deve editar um livro")
-	public void deve_editar_livro() throws Exception {
+	public void deve_editar_um_livro() throws Exception {
 		Long id = 80L;
 		LivroEntity livroSalvo = LivroEntity.builder().id(id).titulo("Teste com tdd").autor("alguém").isbn("123").build();
 		BDDMockito.given(livroService.buscarPorId(id)).willReturn(Optional.of(livroSalvo));
