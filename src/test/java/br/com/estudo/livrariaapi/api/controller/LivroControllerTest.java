@@ -31,12 +31,13 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 
 import br.com.estudo.livrariaapi.exception.model.RegraDeNegocioException;
 import br.com.estudo.livrariaapi.persistence.entity.LivroEntity;
+import br.com.estudo.livrariaapi.rest.controller.LivroController;
 import br.com.estudo.livrariaapi.rest.controller.domain.dto.LivroDto;
 import br.com.estudo.livrariaapi.rest.service.LivroService;
 
 @ExtendWith(SpringExtension.class)
 @ActiveProfiles("test")
-@WebMvcTest
+@WebMvcTest(controllers = LivroController.class)
 @AutoConfigureMockMvc
 public class LivroControllerTest {
 

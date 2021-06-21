@@ -18,7 +18,7 @@ public interface LivroService {
 	public LivroEntity editar(LivroEntity livro);
 
 	public Page<LivroEntity> buscarPorTituloAutor(LivroEntity filtro, Pageable pageable);
-	
-	
+
+	public Optional<LivroEntity> buscarPorIsbn(String isbn);
 
 }

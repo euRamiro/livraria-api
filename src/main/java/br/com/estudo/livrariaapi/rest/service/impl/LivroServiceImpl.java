@@ -61,6 +61,11 @@ public class LivroServiceImpl implements LivroService {
 		
 		return this.livroRepository.findAll(example, pageable);
 	}
+
+	@Override
+	public Optional<LivroEntity> buscarPorIsbn(String isbn) {
+		return livroRepository.findByIsbn(isbn);
+	}
 		
 
 }
