@@ -13,7 +13,6 @@ import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.Mockito;
 import org.springframework.boot.test.mock.mockito.MockBean;
-import org.springframework.data.domain.Example;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.PageRequest;
@@ -152,7 +151,7 @@ public class LivroServiceTest {
 		lista.add(livro);
 		Page<LivroEntity> page = new PageImpl<LivroEntity>(lista, pageRequest, 1);
 		Mockito
-			.when( livroRepository.findAll(Mockito.any(Example.class), Mockito.any(PageRequest.class)))
+			.when( livroRepository.findAll(Mockito.any(), Mockito.any(PageRequest.class)))
 			.thenReturn(page);
 		
 		Page<LivroEntity> resultado = livroService.buscarPorTituloAutor(livro, pageRequest);
@@ -161,5 +160,21 @@ public class LivroServiceTest {
 		assertThat(resultado.getContent()).isEqualTo(lista);
 		assertThat(resultado.getPageable().getPageNumber()).isEqualTo(0);
 		assertThat(resultado.getPageable().getPageSize()).isEqualTo(10);
+	}
+	
+	@Test
+	@DisplayName("deve buscar um livro por isbn")
+	public void deve_buscar_um_livro_por_isbn() throws Exception {
+		String isbn = "123";
+		LivroEntity livroSalvo = LivroEntity.builder().id(10L).titulo("Springboot na prática").autor("Spring").isbn(isbn).build();
+		Mockito.when(livroRepository.findByIsbn(isbn)).thenReturn(Optional.of(livroSalvo));
+		
+		Optional<LivroEntity> livroEncontrado = livroService.buscarPorIsbn(isbn);
+		
+		Mockito.verify(livroRepository, Mockito.times(1)).findByIsbn(isbn);
+		assertThat(livroEncontrado.isPresent()).isTrue();
+		assertThat(livroSalvo.getTitulo()).isEqualTo(livroEncontrado.get().getTitulo());
+		assertThat(livroSalvo.getAutor()).isEqualTo(livroEncontrado.get().getAutor());
+		assertThat(livroSalvo.getIsbn()).isEqualTo(livroEncontrado.get().getIsbn());
 	}
 }
