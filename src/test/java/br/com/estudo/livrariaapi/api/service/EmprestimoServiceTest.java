@@ -7,6 +7,8 @@ import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
 import java.time.LocalDate;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Optional;
 
 import org.junit.jupiter.api.BeforeEach;
@@ -15,6 +17,9 @@ import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.Mockito;
 import org.springframework.boot.test.mock.mockito.MockBean;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageImpl;
+import org.springframework.data.domain.PageRequest;
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
 
@@ -22,6 +27,7 @@ import br.com.estudo.livrariaapi.exception.model.RegraDeNegocioException;
 import br.com.estudo.livrariaapi.persistence.entity.EmprestimoEntity;
 import br.com.estudo.livrariaapi.persistence.entity.LivroEntity;
 import br.com.estudo.livrariaapi.persistence.repository.EmprestimoRepository;
+import br.com.estudo.livrariaapi.rest.controller.domain.dto.EmprestimoFiltroDto;
 import br.com.estudo.livrariaapi.rest.service.EmprestimoService;
 import br.com.estudo.livrariaapi.rest.service.impl.EmprestimoServiceImpl;
 
@@ -167,4 +173,39 @@ public class EmprestimoServiceTest {
 		
 		verify(emprestimoRepository).save(Mockito.any());
 	}
+	
+	@Test
+	@DisplayName("deve buscar por isbn e cliente")
+	public void deve_buscar_por_isbn_e_cliente() {
+		EmprestimoFiltroDto filtroDto = EmprestimoFiltroDto.builder()
+				.cliente("Lord")
+				.isbn("135984")
+				.build();
+		
+		LivroEntity livro = LivroEntity.builder().titulo("Refatorando").autor("João").isbn("135984").build();
+		EmprestimoEntity emprestimo = EmprestimoEntity.builder()
+				.id(5L)
+				.livro(livro)
+				.cliente("Lord")
+				.data(LocalDate.now())				
+				.build();
+		
+		PageRequest pageRequest = PageRequest.of(0, 5);
+				
+		List<EmprestimoEntity> lista = new ArrayList<>();
+		lista.add(emprestimo);
+		Page<EmprestimoEntity> page = new PageImpl<EmprestimoEntity>(lista, pageRequest, lista.size());
+		
+		Mockito
+			.when( emprestimoRepository.findByIbsnOrCliente(Mockito.anyString(), Mockito.anyString(), Mockito.any(PageRequest.class)))
+			.thenReturn(page);
+		
+		Page<EmprestimoEntity> resultado = emprestimoService.buscarPorIbsnOuCliente(filtroDto, pageRequest);
+		
+		assertThat(resultado.getTotalElements()).isEqualTo(1);
+		assertThat(resultado.getContent()).isEqualTo(lista);
+		assertThat(resultado.getPageable().getPageNumber()).isEqualTo(0);
+		assertThat(resultado.getPageable().getPageSize()).isEqualTo(5);
+	}
+	
 }

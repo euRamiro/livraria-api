@@ -6,13 +6,11 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 
 @Data
-@Builder
 @AllArgsConstructor
 @NoArgsConstructor
-public class EmprestimoDto {
+@Builder
+public class EmprestimoFiltroDto {
 
-	private Long id;
 	private String isbn;
 	private String cliente;
-	private LivroDto livro;
 }

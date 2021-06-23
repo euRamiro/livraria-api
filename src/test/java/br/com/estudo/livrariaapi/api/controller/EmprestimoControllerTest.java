@@ -5,8 +5,10 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
 import java.time.LocalDate;
+import java.util.List;
 import java.util.Optional;
 
+import org.hamcrest.Matchers;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -16,6 +18,9 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
+import org.springframework.data.domain.PageImpl;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
 import org.springframework.http.MediaType;
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
@@ -31,6 +36,7 @@ import br.com.estudo.livrariaapi.persistence.entity.LivroEntity;
 import br.com.estudo.livrariaapi.rest.controller.EmprestimoController;
 import br.com.estudo.livrariaapi.rest.controller.domain.dto.EmprestimoDevolvidoDto;
 import br.com.estudo.livrariaapi.rest.controller.domain.dto.EmprestimoDto;
+import br.com.estudo.livrariaapi.rest.controller.domain.dto.EmprestimoFiltroDto;
 import br.com.estudo.livrariaapi.rest.service.EmprestimoService;
 import br.com.estudo.livrariaapi.rest.service.LivroService;
 
@@ -203,5 +209,42 @@ public class EmprestimoControllerTest {
 			).andExpect(status().isNotFound());
 				
 		Mockito.verify(emprestimoService, Mockito.never()).alterar(Mockito.any());
+	}
+	
+	@Test
+	@DisplayName("deve filtrar emprestimos")
+	public void deve_filtrar_emprestimos() throws Exception{
+		Long id = 2L;
+		LivroEntity livro = LivroEntity.builder()
+				.id(1L)
+				.titulo("css power")
+				.autor("Maujor")
+				.isbn("159")
+				.build();
+		EmprestimoEntity emprestimo = EmprestimoEntity.builder()
+				.id(id)
+				.cliente("Lord")
+				.data(LocalDate.now())
+				.livro(livro)
+				.build();
+		
+		BDDMockito.given(emprestimoService.buscarPorIbsnOuCliente(Mockito.any(EmprestimoFiltroDto.class), Mockito.any(Pageable.class)) )
+			.willReturn( new PageImpl<EmprestimoEntity>(List.of(emprestimo), PageRequest.of(0,5), 1) );
+
+		String queryString = String.format("?isbn=%S&cliente=%s&page=0&size=5",
+				livro.getIsbn(), emprestimo.getCliente());
+		
+		MockHttpServletRequestBuilder request = MockMvcRequestBuilders
+				.get(EMPRESTIMO_API.concat(queryString))
+				.accept(MediaType.APPLICATION_JSON)
+				;
+		
+		mock.perform(request)
+			.andExpect(status().isOk())
+			.andExpect(jsonPath("content", Matchers.hasSize(1)))
+			.andExpect(jsonPath("totalElements").value(1))
+			.andExpect(jsonPath("pageable.pageSize").value(5))
+			.andExpect(jsonPath("pageable.pageNumber").value(0))
+			;
 	}
 }

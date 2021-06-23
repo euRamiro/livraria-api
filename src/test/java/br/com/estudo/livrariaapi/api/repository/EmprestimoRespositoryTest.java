@@ -10,6 +10,8 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.orm.jpa.DataJpaTest;
 import org.springframework.boot.test.autoconfigure.orm.jpa.TestEntityManager;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
 
@@ -48,8 +50,33 @@ public class EmprestimoRespositoryTest {
 		
 		boolean exists = emprestimoRepository.existsByLivroAndNotDevolvido(livro);
 		
-		assertThat(exists).isTrue();		
+		assertThat(exists).isTrue();
 	}
 	
+	@Test
+	@DisplayName("deve buscar por isbn ou cliente")
+	public void deve_buscar_por_isbn_ou_cliente() {
+		LivroEntity livro = LivroEntity.builder()
+				.titulo("css power")
+				.autor("Maujor")
+				.isbn("159")
+				.build();
+		entityManager.persist(livro);
+		
+		EmprestimoEntity emprestimo = EmprestimoEntity.builder()
+				.livro(livro)
+				.cliente("Lord")
+				.data(LocalDate.now())
+				.build();
+		entityManager.persist(emprestimo);
+		
+		Page<EmprestimoEntity> resultado = emprestimoRepository.findByIbsnOrCliente("159", "Lord", PageRequest.of(0, 5));
+		
+		
+		assertThat(resultado.getContent()).hasSize(1);
+		assertThat(resultado.getPageable().getPageSize()).isEqualTo(5);
+		assertThat(resultado.getPageable().getPageNumber()).isEqualTo(0);
+		assertThat(resultado.getTotalElements()).isEqualTo(1);
+	}
 	
 }

@@ -2,14 +2,20 @@ package br.com.estudo.livrariaapi.rest.service;
 
 import java.util.Optional;
 
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
+
 import br.com.estudo.livrariaapi.persistence.entity.EmprestimoEntity;
+import br.com.estudo.livrariaapi.rest.controller.domain.dto.EmprestimoFiltroDto;
 
 public interface EmprestimoService {
 
-	EmprestimoEntity salvar(EmprestimoEntity emprestimo);
+	public EmprestimoEntity salvar(EmprestimoEntity emprestimo);
 
-	Optional<EmprestimoEntity> buscarPorId(Long id);
+	public Optional<EmprestimoEntity> buscarPorId(Long id);
 
-	EmprestimoEntity alterar(EmprestimoEntity emprestimo);
+	public EmprestimoEntity alterar(EmprestimoEntity emprestimo);
+
+	public Page<EmprestimoEntity> buscarPorIbsnOuCliente(EmprestimoFiltroDto filtroDto, Pageable pageRequest);
 
 }
