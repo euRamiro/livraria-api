@@ -26,6 +26,8 @@ public class EmprestimoEntity {
 	private Long id;
 	private String cliente;
 	
+	private String emailCliente;
+	
 	@JoinColumn
 	@ManyToOne
 	private LivroEntity livro;

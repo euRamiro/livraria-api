@@ -1,5 +1,7 @@
 package br.com.estudo.livrariaapi.rest.service.impl;
 
+import java.time.LocalDate;
+import java.util.List;
 import java.util.Optional;
 
 import org.springframework.beans.factory.annotation.Autowired;
@@ -9,6 +11,7 @@ import org.springframework.stereotype.Service;
 
 import br.com.estudo.livrariaapi.exception.model.RegraDeNegocioException;
 import br.com.estudo.livrariaapi.persistence.entity.EmprestimoEntity;
+import br.com.estudo.livrariaapi.persistence.entity.LivroEntity;
 import br.com.estudo.livrariaapi.persistence.repository.EmprestimoRepository;
 import br.com.estudo.livrariaapi.rest.controller.domain.dto.EmprestimoFiltroDto;
 import br.com.estudo.livrariaapi.rest.service.EmprestimoService;
@@ -44,6 +47,19 @@ public class EmprestimoServiceImpl implements EmprestimoService {
 	@Override
 	public Page<EmprestimoEntity> buscarPorIbsnOuCliente(EmprestimoFiltroDto filtroDto, Pageable pageRequest) {
 		return emprestimoRepository.findByIbsnOrCliente(filtroDto.getIsbn(), filtroDto.getCliente(), pageRequest);
+	}
+
+	@Override
+	public Page<EmprestimoEntity> buscarEmprestimosPorLivro(LivroEntity livro, Pageable pageable) {
+		return emprestimoRepository.findByLivro(livro, pageable);
+	}
+
+	@Override
+	public List<EmprestimoEntity> buscarTodosEmprestimosAtrasados() {
+		final Integer diasEmprestimo = 4;
+		LocalDate diasAtras = LocalDate.now().minusDays(diasEmprestimo);
+				
+		return emprestimoRepository.findByEmprestimoNaoDevolvido(diasAtras);
 	}
 
 }

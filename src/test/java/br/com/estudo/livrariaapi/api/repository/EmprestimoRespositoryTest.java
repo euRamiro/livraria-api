@@ -3,6 +3,7 @@ package br.com.estudo.livrariaapi.api.repository;
 import static org.assertj.core.api.Assertions.assertThat;
 
 import java.time.LocalDate;
+import java.util.List;
 
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -77,6 +78,50 @@ public class EmprestimoRespositoryTest {
 		assertThat(resultado.getPageable().getPageSize()).isEqualTo(5);
 		assertThat(resultado.getPageable().getPageNumber()).isEqualTo(0);
 		assertThat(resultado.getTotalElements()).isEqualTo(1);
+	}
+	
+	@Test
+	@DisplayName("deve buscar emprestimos em atraso não devolvidos")
+	public void deve_buscar_emprestimos_em_atraso_nao_devolvidos() {
+		LivroEntity livro = LivroEntity.builder()
+				.titulo("css power")
+				.autor("Maujor")
+				.isbn("159")
+				.build();
+		entityManager.persist(livro);
+		
+		EmprestimoEntity emprestimo = EmprestimoEntity.builder()
+				.livro(livro)
+				.cliente("Lord")
+				.data(LocalDate.now().minusDays(5))
+				.build();
+		entityManager.persist(emprestimo);
+		
+		List<EmprestimoEntity> emprestimosEncontrados = emprestimoRepository.findByEmprestimoNaoDevolvido(LocalDate.now().minusDays(4));
+		
+		assertThat(emprestimosEncontrados).hasSize(1).contains(emprestimo);
+	}
+	
+	@Test
+	@DisplayName("deve retornar vazio quando não houver emprestimos atrasados")
+	public void  deve_retornar_vazio_quando_nao_houver_emprestimos_atrasados() {
+		LivroEntity livro = LivroEntity.builder()
+				.titulo("css power")
+				.autor("Maujor")
+				.isbn("159")
+				.build();
+		entityManager.persist(livro);
+		
+		EmprestimoEntity emprestimo = EmprestimoEntity.builder()
+				.livro(livro)
+				.cliente("Lord")
+				.data(LocalDate.now())
+				.build();
+		entityManager.persist(emprestimo);
+		
+		List<EmprestimoEntity> emprestimosEncontrados = emprestimoRepository.findByEmprestimoNaoDevolvido(LocalDate.now().minusDays(4));
+		
+		assertThat(emprestimosEncontrados).isEmpty();
 	}
 	
 }

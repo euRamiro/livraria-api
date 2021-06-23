@@ -64,6 +64,7 @@ public class EmprestimoControllerTest {
 		EmprestimoDto dto = EmprestimoDto.builder()
 				.isbn("123")
 				.cliente("Lord")
+				.emailCliente("lord@gmail.com")
 				.build();
 		String json = new ObjectMapper().writeValueAsString(dto);
 		
@@ -103,6 +104,7 @@ public class EmprestimoControllerTest {
 		EmprestimoDto dto = EmprestimoDto.builder()
 				.isbn("123")
 				.cliente("Lord")
+				.emailCliente("lord@gmail.com")
 				.build();
 		String json = new ObjectMapper().writeValueAsString(dto);
 		
@@ -129,6 +131,7 @@ public class EmprestimoControllerTest {
 		EmprestimoDto dto = EmprestimoDto.builder()
 				.isbn("123")
 				.cliente("Lord")
+				.emailCliente("lord@gmail.com")
 				.build();
 		String json = new ObjectMapper().writeValueAsString(dto);
 		
@@ -166,6 +169,7 @@ public class EmprestimoControllerTest {
 		EmprestimoEntity emprestimo = EmprestimoEntity.builder()
 				.id(2L)
 				.cliente("Lord")
+				.emailCliente("lord@gmail.com")
 				.data(LocalDate.now())
 				.livro(LivroEntity.builder()
 						.id(1L)
@@ -224,6 +228,7 @@ public class EmprestimoControllerTest {
 		EmprestimoEntity emprestimo = EmprestimoEntity.builder()
 				.id(id)
 				.cliente("Lord")
+				.emailCliente("lord@gmail.com")
 				.data(LocalDate.now())
 				.livro(livro)
 				.build();

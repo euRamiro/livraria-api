@@ -20,9 +20,13 @@ import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
 
 import br.com.estudo.livrariaapi.exception.model.ObjetoNaoEncontradoException;
+import br.com.estudo.livrariaapi.persistence.entity.EmprestimoEntity;
 import br.com.estudo.livrariaapi.persistence.entity.LivroEntity;
+import br.com.estudo.livrariaapi.rest.controller.domain.dto.EmprestimoDto;
 import br.com.estudo.livrariaapi.rest.controller.domain.dto.LivroDto;
+import br.com.estudo.livrariaapi.rest.controller.domain.dto.mapper.EmprestimoMapper;
 import br.com.estudo.livrariaapi.rest.controller.domain.dto.mapper.LivroMapper;
+import br.com.estudo.livrariaapi.rest.service.EmprestimoService;
 import br.com.estudo.livrariaapi.rest.service.LivroService;
 import lombok.AllArgsConstructor;
 
@@ -32,8 +36,10 @@ import lombok.AllArgsConstructor;
 public class LivroController {
 	
 	LivroService livroService;
+	EmprestimoService emprestimoService;
 	
 	private LivroMapper livroMapper;
+	private EmprestimoMapper emprestimoMapper;
 
 	@PostMapping
 	public ResponseEntity<LivroDto> salvar(@RequestBody @Validated LivroDto livroDto) {		
@@ -86,5 +92,24 @@ public class LivroController {
 					.map(livro -> livroMapper.toDto(livro))
 					.collect(Collectors.toList());
 		return new PageImpl<LivroDto>(lista, pageable, resultado.getNumberOfElements());
+	}
+	
+	@GetMapping("{id}/emprestimos")
+	public Page<EmprestimoDto> emprestimosPorLivro( @PathVariable Long id, Pageable pageable) {
+		LivroEntity livroEncontrado = livroService.buscarPorId(id).orElseThrow( () -> new ObjetoNaoEncontradoException("Livro não encontrado."));
+		Page<EmprestimoEntity> emprestimosAllPages = emprestimoService.buscarEmprestimosPorLivro(livroEncontrado, pageable);
+		List<EmprestimoDto> emprestimosList = emprestimosAllPages.getContent()
+				.stream()
+				.map(emprestimo -> {
+						LivroEntity livroEmprestimo = emprestimo.getLivro();
+						LivroDto livroDto = livroMapper.toDto(livroEmprestimo);
+						EmprestimoDto emprestimoDto = emprestimoMapper.toDto(emprestimo);
+						emprestimoDto.setLivro(livroDto);						
+						return emprestimoDto;
+					}						
+				).collect(Collectors.toList())
+				;
+				
+		return new PageImpl<EmprestimoDto>( emprestimosList, pageable, emprestimosAllPages.getTotalElements());
 	}
 }
