@@ -22,6 +22,6 @@ public interface EmprestimoService {
 
 	public Page<EmprestimoEntity> buscarEmprestimosPorLivro(LivroEntity livroEncontrado, Pageable pageable);
 	
-	List<EmprestimoEntity> buscarTodosEmprestimosAtrasados();
+	public List<EmprestimoEntity> buscarTodosEmprestimosAtrasados();
 
 }

@@ -4,6 +4,6 @@ import java.util.List;
 
 public interface EmailService {
 
-	void enviarEmails(String menssagem, List<String> emailsList);
+	public void enviarEmails(String menssagem, List<String> emailsList);
 
 }

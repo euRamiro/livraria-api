@@ -1,8 +1,10 @@
 package br.com.estudo.livrariaapi.api.controller;
 
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.patch;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
+import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
@@ -33,6 +35,7 @@ import br.com.estudo.livrariaapi.exception.model.RegraDeNegocioException;
 import br.com.estudo.livrariaapi.persistence.entity.LivroEntity;
 import br.com.estudo.livrariaapi.rest.controller.LivroController;
 import br.com.estudo.livrariaapi.rest.controller.domain.dto.LivroDto;
+import br.com.estudo.livrariaapi.rest.service.EmprestimoService;
 import br.com.estudo.livrariaapi.rest.service.LivroService;
 
 @ExtendWith(SpringExtension.class)
@@ -48,6 +51,8 @@ public class LivroControllerTest {
 	
 	@MockBean
 	LivroService livroService;
+	@MockBean
+	EmprestimoService emmprestimoService;
 		
 	@Test
 	@DisplayName("deve salvar um livro com sucesso.")
